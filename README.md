@@ -1,1 +1,4 @@
-SECOND YLYCEUM PROJECT
+# SECOND YLYCEUM PROJECT
+
+Pygame and Mario
+Simple game
