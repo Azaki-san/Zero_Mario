@@ -1,4 +1,5 @@
 import pygame
+import pygame_gui
 import os
 import sys
 
@@ -46,14 +47,68 @@ def load_image(name):
 def start_window():  # самая первая функция для главного экрана
     screen.blit(fon, (0, 0))
 
+    manager = pygame_gui.UIManager(size)
+    start_button = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((800, 400), (225, 75)),
+        text='Start',
+        manager=manager
+    )
+
     while True:
+        time_delta = clock.tick(60) / 1000.0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            elif event.type == pygame.KEYDOWN or \
-                    event.type == pygame.MOUSEBUTTONDOWN:
-                return
+            elif event.type == pygame.USEREVENT:
+                if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                    if event.ui_element == start_button:
+                        return
+            manager.process_events(event)
+        manager.update(time_delta)
+        manager.draw_ui(screen)
         pygame.display.flip()
+
+
+def game():
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_UP]:
+            player.update_pos(player.rect.x, player.rect.y - s)
+        if keys[pygame.K_DOWN]:
+            player.update_pos(player.rect.x, player.rect.y + s)
+        if keys[pygame.K_LEFT]:
+            player.update_pos(player.rect.x - s, player.rect.y)
+        if keys[pygame.K_RIGHT]:
+            player.update_pos(player.rect.x + s, player.rect.y)
+
+        level_text = font.render('Level: ' + str(level), True, level_color)
+        level_text_rect = level_text.get_rect()
+        level_text_rect.top = -25
+        level_text_rect.x = 120
+        screen.blit(level_text, level_text_rect)
+
+        score_text = font.render('Score: ' + str(score), True, score_color)
+        score_text_rect = score_text.get_rect()
+        score_text_rect.top = -25
+        score_text_rect.x = 320
+        screen.blit(score_text, score_text_rect)
+
+        top_score_text = font.render('Top Score: ' + str(top_score), True, top_score_color)
+        top_score_text_rect = top_score_text.get_rect()
+        top_score_text_rect.top = -25
+        top_score_text_rect.x = 535
+        screen.blit(top_score_text, top_score_text_rect)
+
+        pygame.display.update()
+        screen.blit(fon_level1, (0, 0))
+        all_sprites.draw(screen)
+        all_sprites.update()
+        clock.tick(60)
 
 
 def terminate():
@@ -79,57 +134,38 @@ if __name__ == '__main__':
     level_color = pygame.color.Color('green')
     score_color = pygame.color.Color('brown')
     top_score_color = pygame.color.Color('red')
-
-    start_window()
-
-    score = 0
-    top_score = 0
-    level = 1
+    player = False
+    bowser = False
 
     player_image = load_image('mar.png')
     bowser_image = load_image('bowser2.png')
-    player = Player()
-    bowser = Bowser()
 
-    run = True
-    while run:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-        keys = pygame.key.get_pressed()
+    while True:
+        start_window()
 
-        if keys[pygame.K_UP]:
-            player.update_pos(player.rect.x, player.rect.y - s)
-        if keys[pygame.K_DOWN]:
-            player.update_pos(player.rect.x, player.rect.y + s)
-        if keys[pygame.K_LEFT]:
-            player.update_pos(player.rect.x - s, player.rect.y)
-        if keys[pygame.K_RIGHT]:
-            player.update_pos(player.rect.x + s, player.rect.y)
+        score = 0
+        top_score = 0
+        level = 1
 
+        if not player and not bowser:
+            player = Player()
+            bowser = Bowser()
 
+        game()
 
-        level_text = font.render('Level: ' + str(level), True, level_color)
-        level_text_rect = level_text.get_rect()
-        level_text_rect.top = -25
-        level_text_rect.x = 120
-        screen.blit(level_text, level_text_rect)
+        fon2 = pygame.transform.scale(load_image('game_over.jpg'), (WIDTH, HEIGHT))
+        screen.blit(fon2, (0, 0))
 
-        score_text = font.render('Score: ' + str(score), True, score_color)
-        score_text_rect = score_text.get_rect()
-        score_text_rect.top = -25
-        score_text_rect.x = 320
-        screen.blit(score_text, score_text_rect)
+        flag = False
+        while True:
+            if flag:
+                break
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    terminate()
+                elif event.type == pygame.KEYDOWN or \
+                        event.type == pygame.MOUSEBUTTONDOWN:
+                    flag = True
+            pygame.display.flip()
 
-        top_score_text = font.render('Top Score: ' + str(top_score), True, top_score_color)
-        top_score_text_rect = top_score_text.get_rect()
-        top_score_text_rect.top = -25
-        top_score_text_rect.x = 535
-        screen.blit(top_score_text, top_score_text_rect)
-
-        pygame.display.update()
-        screen.blit(fon_level1, (0, 0))
-        all_sprites.draw(screen)
-        all_sprites.update()
-        clock.tick(60)
 
