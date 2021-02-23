@@ -2,6 +2,7 @@ import pygame
 import pygame_gui
 import os
 import sys
+import time
 
 
 class Player(pygame.sprite.Sprite):
@@ -9,11 +10,26 @@ class Player(pygame.sprite.Sprite):
         super().__init__(player_group, all_sprites)
         self.image = player_image
         self.rect = self.image.get_rect().move(0, 0)
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update_pos(self, x, y):
         if 0 <= x <= 940 and 0 <= y <= 524:
             self.rect.x = x
             self.rect.y = y
+
+
+class Pulya(pygame.sprite.Sprite):
+    def __init__(self):
+        y1 = bowser.rect.y
+        super().__init__(player_group, all_sprites)
+        self.image = pulya_image
+        self.image = pygame.transform.scale(self.image, (40, 25))
+        self.rect = self.image.get_rect().move(914, y1)
+        pulya_group.add(self)
+        pygame.time.set_timer(update, milliseconds)
+
+    def update(self, *args):
+        self.rect.x -= 10
 
 
 class Bowser(pygame.sprite.Sprite):
@@ -117,6 +133,7 @@ def terminate():
 
 
 all_sprites = pygame.sprite.Group()
+pulya_group = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 
@@ -136,11 +153,14 @@ if __name__ == '__main__':
     top_score_color = pygame.color.Color('red')
     player = False
     bowser = False
+    pulya = False
 
     player_image = load_image('mar.png')
+    pulya_image = load_image("1.png")
     bowser_image = load_image('bowser2.png')
 
     while True:
+
         start_window()
 
         score = 0
@@ -150,6 +170,7 @@ if __name__ == '__main__':
         if not player and not bowser:
             player = Player()
             bowser = Bowser()
+        pulya = Pulya()
 
         game()
 
@@ -167,5 +188,3 @@ if __name__ == '__main__':
                         event.type == pygame.MOUSEBUTTONDOWN:
                     flag = True
             pygame.display.flip()
-
-
