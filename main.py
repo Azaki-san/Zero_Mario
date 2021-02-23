@@ -25,11 +25,29 @@ class Pulya(pygame.sprite.Sprite):
         self.image = pulya_image
         self.image = pygame.transform.scale(self.image, (40, 25))
         self.rect = self.image.get_rect().move(914, y1)
-        pulya_group.add(self)
-        pygame.time.set_timer(update, milliseconds)
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, *args):
-        self.rect.x -= 10
+        if not pygame.sprite.collide_mask(self, player):
+            self.rect.x -= 4
+        else:
+            return
+
+class Monetka(pygame.sprite.Sprite):
+    def __init__(self):
+        y1 = bowser.rect.y
+        super().__init__(player_group, all_sprites)
+        self.image = monetka_image
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        self.rect = self.image.get_rect().move(914, y1)
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def update(self, *args):
+        if not pygame.sprite.collide_mask(self, player):
+            self.rect.x -= 4
+        else:
+            self.kill()
+
 
 
 class Bowser(pygame.sprite.Sprite):
@@ -86,8 +104,23 @@ def start_window():  # самая первая функция для главн�
 
 
 def game():
+    score = 0
     run = True
+    a = 0
+    a2 = 0
+    last_time_ms = int(round(time.time() * 1000))
     while run:
+        diff_time_ms = int(round(time.time() * 1000)) - last_time_ms
+        if diff_time_ms >= 400:
+            a += 1
+            a2 += 1
+            last_time_ms = int(round(time.time() * 1000))
+        if a == 3:
+            a = 0
+            Pulya()
+        if a2 == 5:
+            a2 = 0
+            Monetka()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -97,10 +130,6 @@ def game():
             player.update_pos(player.rect.x, player.rect.y - s)
         if keys[pygame.K_DOWN]:
             player.update_pos(player.rect.x, player.rect.y + s)
-        if keys[pygame.K_LEFT]:
-            player.update_pos(player.rect.x - s, player.rect.y)
-        if keys[pygame.K_RIGHT]:
-            player.update_pos(player.rect.x + s, player.rect.y)
 
         level_text = font.render('Level: ' + str(level), True, level_color)
         level_text_rect = level_text.get_rect()
@@ -154,10 +183,12 @@ if __name__ == '__main__':
     player = False
     bowser = False
     pulya = False
+    monetka = False
 
     player_image = load_image('mar.png')
     pulya_image = load_image("1.png")
     bowser_image = load_image('bowser2.png')
+    monetka_image = load_image('monetka.png')
 
     while True:
 
