@@ -6,7 +6,7 @@ import time
 from random import randrange, choice
 
 
-class Player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite):  # класс игрока
     def __init__(self):
         super().__init__(player_group, all_sprites)
         self.image = player_image
@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.y = y
 
 
-class Bowser(pygame.sprite.Sprite):
+class Bowser(pygame.sprite.Sprite):  # класс злодея
     def __init__(self):
         super().__init__(player_group, all_sprites)
         self.image = bowser_image
@@ -36,7 +36,7 @@ class Bowser(pygame.sprite.Sprite):
 
     def update(self, *args):
         if not self.is_paused:
-            if self.down and self.rect.y + self.speed <= 514:
+            if self.down and self.rect.y + self.speed <= 514:  # вылет за границу
                 self.rect.y += self.speed
             else:
                 self.down = False
@@ -49,7 +49,7 @@ class Bowser(pygame.sprite.Sprite):
                 ora()
 
 
-class Bullet(pygame.sprite.Sprite):
+class Bullet(pygame.sprite.Sprite):  # класс пули
     def __init__(self):
         y1 = bowser.rect.y
         super().__init__(player_group, all_sprites)
@@ -143,7 +143,7 @@ def load_image(name):
     return image
 
 
-def confirmation_exit(manager_):
+def confirmation_exit(manager_):  # окошко с подтверждением выхода
     confirmation_dialog = pygame_gui.windows.UIConfirmationDialog(
         rect=pygame.Rect((375, 200), (300, 200)),
         manager=manager_,
@@ -203,6 +203,7 @@ def start_window():  # самая первая функция для главн�
 def change_score(plus=1):
     global score, top_score
 
+    '''В этой функции происходит смена очков, требуется проверка на режим игры'''
     score += plus
     if score > top_score:
         top_score = score
@@ -254,7 +255,7 @@ def ora():
         bowser.speed = 0
 
 
-def game(name, g_mode):
+def game(name, g_mode):  # функция игры!!
     global s, ora_
 
     ora_ = False
@@ -315,6 +316,7 @@ def game(name, g_mode):
         if j_c == 40:
             return
 
+        '''r, f - переменные с какой периодичностью будут появляться объекты'''
         if level == 1:
             r, f = 4, 10
         elif level == 2:
@@ -334,7 +336,7 @@ def game(name, g_mode):
             box_c = 0
             if not b_box or not b_box.isActive:
                 b_box = Box()
-        if b_box:
+        if b_box:  # коробка и её проверка
             if b_box.touched:
                 b_box = False
                 haha = ['SPEEDUP', '+ 10 SCORE', 'О, повезло повезло', 'JOJO reference']
@@ -469,7 +471,6 @@ def game(name, g_mode):
         manager.draw_ui(screen)
 
 
-
 def terminate():
     pygame.quit()
     sys.exit()
@@ -479,7 +480,7 @@ s = 4
 
 if __name__ == '__main__':
     pygame.init()
-    pygame.display.set_caption('Mario Game v0.0001')
+    pygame.display.set_caption('Zero Mario')
     size = WIDTH, HEIGHT = 1000, 600
 
     screen = pygame.display.set_mode(size)
